@@ -102,12 +102,12 @@ jobs:
             docker stop receptor-app || true
             docker rm receptor-app || true
             
-            # 4. Levantar el nuevo contenedor worker (Sin puertos, solo variables)
+            # 4. Levantar el nuevo contenedor worker
             docker run -d --name receptor-app \
               -e AWS_REGION="${{ secrets.AWS_DEFAULT_REGION }}" \
               -e SQS_QUEUE_NAME="cola-boletines" \
               -e DYNAMO_TABLE_NAME="boletines_recibidos" \
               -e SNS_TOPIC_ARN="${{ secrets.SNS_TOPIC_ARN }}" \
-              -e MOSTRADOR_BASE_URL="http://${{ secrets.EC2_HOST_DEV }}:8001" \
+              -e MOSTRADOR_BASE_URL="http://${{ secrets.EC2_HOST_DEV }}:8081" \
               $DOCKER_IMAGE
           EOF
