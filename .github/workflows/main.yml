@@ -108,6 +108,6 @@ jobs:
               -e SQS_QUEUE_NAME="cola-boletines" \
               -e DYNAMO_TABLE_NAME="boletines_recibidos" \
               -e SNS_TOPIC_ARN="${{ secrets.SNS_TOPIC_ARN }}" \
-              -e MOSTRADOR_BASE_URL="http://${{ secrets.EC2_HOST_DEV }}:8081" \
+              -e MOSTRADOR_BASE_URL="http://${{ secrets.EC2_HOST_DEV }}:8001" \
               $DOCKER_IMAGE
           EOF
