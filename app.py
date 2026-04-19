@@ -1,12 +1,14 @@
+import os
 import time
 import json
 import uuid
 import boto3
 
-REGION = "us-east-1"
-SQS_QUEUE_NAME = "cola-boletines"
-DYNAMO_TABLE_NAME = "boletines_recibidos"
-SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:907235489057:notificaciones-boletines"
+REGION = os.getenv("AWS_REGION", "us-east-1")
+SQS_QUEUE_NAME = os.getenv("SQS_QUEUE_NAME", "cola-boletines")
+DYNAMO_TABLE_NAME = os.getenv("DYNAMO_TABLE_NAME", "boletines_recibidos")
+SNS_TOPIC_ARN = os.getenv("SNS_TOPIC_ARN") 
+MOSTRADOR_BASE_URL = os.getenv("MOSTRADOR_BASE_URL", "http://localhost:8001") 
 
 sqs_client = boto3.client('sqs', region_name=REGION)
 sns_client = boto3.client('sns', region_name=REGION)
@@ -37,8 +39,7 @@ def procesar_mensaje(mensaje, queue_url):
         )
         print(f"Guardado en DynamoDB con ID: {boletin_id}")
 
-      
-        link_ver_boletin = f"http://3.222.98.202:8001/boletines/{boletin_id}?correo={correo}"
+        link_ver_boletin = f"{MOSTRADOR_BASE_URL}/boletines/{boletin_id}?correo={correo}"
         
         mensaje_sns = (
             f"¡Tienes un nuevo boletín!\n\n"
@@ -80,7 +81,7 @@ def iniciar_worker():
                     print("\n--- Nuevo mensaje detectado ---")
                     procesar_mensaje(msg, queue_url)
             else:
-                print("⏳ Esperando mensajes...")
+                print("Esperando mensajes...")
                 
         except Exception as e:
             print(f" Error en el worker: {e}")
