@@ -92,17 +92,13 @@ jobs:
           DOCKER_IMAGE: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ needs.build.outputs.version_tag }}
         run: |
           ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_DEV }} << EOF
-            # 1. Autenticación en ECR
             aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
             
-            # 2. Descargar la nueva imagen
             docker pull $DOCKER_IMAGE
             
-            # 3. Limpieza (¡Nombres corregidos!)
             docker stop receptor-app || true
             docker rm receptor-app || true
             
-            # 4. Levantar el nuevo contenedor worker
             docker run -d --name receptor-app \
               -e AWS_REGION="${{ secrets.AWS_DEFAULT_REGION }}" \
               -e SQS_QUEUE_NAME="cola-boletines" \
